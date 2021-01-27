@@ -2,6 +2,22 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
+require 'sqlite3'
+
+configure do
+	@db = SQLite3::Database.new 'barbershop.db'
+	@db.execute 'CREATE  TABLE IF NOT EXISTS
+		"Users"
+		(
+			"id" INTEGER PRIMARY KEY  AUTOINCREMENT  UNIQUE,
+			"username" TEXT,
+			"phone" TEXT,
+			"datestamp" TEXT,
+			"barber" TEXT,
+			"color" TEXT
+		)'
+
+end	
 
 get '/' do
 	erb "Здравствуйте! Добро пожаловать на сайт нашей парикмахерской \"Barber Shop\". Для записи перейдите по <a href=\"/visit\">ссылке</a>."			
@@ -19,14 +35,14 @@ post '/visit' do
 
 	@username = params[:username]
 	@phone = params[:phone]
-	@datetime = params[:datetime]
+	@date_time = params[:date_time]
 	@barber = params[:barber]
 	@color = params[:color]
 
 
 	hh = { 	:username => 'Введите имя',
 			:phone => 'Введите телефон',
-			:datetime => 'Введите дату и время' }
+			:date_time => 'Введите дату и время' }
 
 	@error = hh.select {|key,_| params[key] == ""}.values.join(", ")
 
@@ -34,7 +50,10 @@ post '/visit' do
 		return erb :visit
 	end
 
-	erb "OK, username is #{@username}, #{@phone}, #{@datetime}, #{@barber}, #{@color}"
+	f = File.open "./public/users.txt", "a"
+	f.write "User: #{@username}, Phone: #{@userphone}, Date and time: #{@date_time}, Barber: #{@barber}, Color: #{@color}<br />\n"
+	f.close
+	erb "Спасибо! #{@username.capitalize}, мы будем ждать вас #{@date_time}"
 
 end
 
