@@ -4,9 +4,15 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
+def get_db
+	db = SQLite3::Database.new 'barbershop.db'
+	db.results_as_hash = true
+	return db	
+end
+
 configure do
-	@db = SQLite3::Database.new 'barbershop.db'
-	@db.execute 'CREATE  TABLE IF NOT EXISTS
+	db = get_db
+	db.execute 'CREATE  TABLE IF NOT EXISTS
 		"Users"
 		(
 			"id" INTEGER PRIMARY KEY  AUTOINCREMENT  UNIQUE,
@@ -16,7 +22,6 @@ configure do
 			"barber" TEXT,
 			"color" TEXT
 		)'
-
 end	
 
 get '/' do
@@ -50,12 +55,27 @@ post '/visit' do
 		return erb :visit
 	end
 
-	f = File.open "./public/users.txt", "a"
-	f.write "User: #{@username}, Phone: #{@userphone}, Date and time: #{@date_time}, Barber: #{@barber}, Color: #{@color}<br />\n"
-	f.close
+	#f = File.open "./public/users.txt", "a"
+	#f.write "User: #{@username}, Phone: #{@userphone}, Date and time: #{@date_time}, Barber: #{@barber}, Color: #{@color}<br />\n"
+	#f.close
+
+	db = get_db
+	db.execute 'INSERT INTO
+		Users
+		(
+			username,
+			phone,
+			datestamp,
+			barber,
+			color
+		)
+		VALUES
+		( ?, ?, ?, ? , ? )', [@username, @userphone, @date_time, @barber, @color]
+
 	erb "Спасибо! #{@username.capitalize}, мы будем ждать вас #{@date_time}"
 
 end
+
 
 
 get '/contacts' do
