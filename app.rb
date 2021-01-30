@@ -122,3 +122,7 @@ post '/admin' do
 		erb :admin 
 	end
 end
+
+get '/showusers' do
+  erb :showusers
+end 
