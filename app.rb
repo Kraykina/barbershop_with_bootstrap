@@ -100,7 +100,7 @@ post '/visit' do
 		VALUES
 		( ?, ?, ?, ? , ? )', [@username, @userphone, @date_time, @barber, @color]
 
-	erb "Спасибо! #{@username.capitalize}, мы будем ждать вас #{@date_time}"
+	erb "<h2>Спасибо, вы записались!</h2>"
 end
 
 
